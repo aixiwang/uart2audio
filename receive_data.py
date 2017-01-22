@@ -1,5 +1,5 @@
 #---------------------------------------
-# receive uart data from audio in
+# received uart data from audio in
 #
 # aixi.wang@hotmail.com
 #---------------------------------------
@@ -29,7 +29,6 @@ bit_state_machine_status = 0
 
 last_i = None
 last_j = None
-
     
 #-------------------------
 # feature_energy
@@ -76,7 +75,31 @@ def bitarray_to_str(arr):
         s += chr(d)
     
     return s
+
+#-------------------------
+# validate_and_retrieve_raw
+#-------------------------    
+def validate_and_retrieve_raw(s):
+    retcode = 0
+    if len(s) < 4:
+        return -1, ''
     
+    if s[0] != '\x55':
+        return -2, ''
+    
+    if ord(s[1]) != len(s)-3:
+        return -3, ''
+        
+    checksum = 0
+    for i in range(2,len(s)-1):
+        #print 'i:',i
+        checksum += ord(s[i])
+    checksum %= 256
+    
+    if ord(s[-1]) != checksum:
+        return -4,''
+    
+    return 0, s[2:-1]
 #-------------------------
 # decode_uart_data
 #-------------------------    
@@ -101,10 +124,19 @@ def do_idle():
         #print 'bit_array :',len(bit_array),',',bit_array
         bit_array2 = bit_remove_balance(bit_array)
         #print 'bit_array2:',len(bit_array2),',',bit_array2
-        print'received str(hex):',bitarray_to_str(bit_array2).encode('hex')
-        print'received str:',bitarray_to_str(bit_array2)
-        bit_array = []
-
+        s2 = bitarray_to_str(bit_array2)
+        retcode, s3 = validate_and_retrieve_raw(s2)
+        if retcode == 0:
+            print'received str(hex):',s3.encode('hex')
+            print'received str:',s3
+            
+        else:
+            print'received str(hex):',s2.encode('hex')
+            print'received str:',s2
+        
+            print 'retcode:',retcode,', package integration checking fail'
+            
+        bit_array = []    
 #-------------------------
 # decode_uart_data
 #-------------------------
@@ -203,6 +235,8 @@ while True:
     except Exception as e:       
         print 'audio exception, retry', str(e)
         time.sleep(1)
+
+
 
 
 

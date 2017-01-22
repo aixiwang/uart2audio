@@ -127,17 +127,28 @@ def create_byte(c):
         s += create_bit0()
     return s
 
-def send_str_pre(s):
-    temp_s = ''
-    bit_array = []
+#---------------------
+# send_str_pre
+#---------------------    
+def send_str_pre(s):   
+    checksum = 0
     for c in s:
+        checksum += ord(c)
+    checksum = checksum % 256
+    
+    s2 = '\x55' + chr(len(s)) + s + chr(checksum)
+    
+    print 's2(hex):',s2.encode('hex')
+    
+    bit_array = []
+    for c in s2:
         bit_array += char_to_bitarray(c)
         
     #print 'bit_array:',len(bit_array),bit_array
     bit_array2 = bit_balance(bit_array)
     #bit_array2 = bit_array
     #print 'bit_array2:',len(bit_array2),bit_array2
-    
+    temp_s = ''
     for b in bit_array2:
         if b == 1:
             temp_s += create_bit1()
@@ -146,6 +157,9 @@ def send_str_pre(s):
     
     return temp_s    
         
+#---------------------
+# main
+#---------------------          
 while(1):
     try:
         s = raw_input(':>')
