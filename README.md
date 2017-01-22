@@ -1,2 +1,2 @@
 # uart2audio
-Receive string from audio jack
+Receive uart string from audio jack
