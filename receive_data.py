@@ -204,7 +204,5 @@ while True:
         print 'audio exception, retry', str(e)
         time.sleep(1)
 
-print "* done recording"
-
 
 
