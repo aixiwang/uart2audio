@@ -1,5 +1,5 @@
 #---------------------------------------
-# received uart data from audio in
+# receive uart data from audio in
 #
 # aixi.wang@hotmail.com
 #---------------------------------------
